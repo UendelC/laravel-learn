@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Produto;
+use Illuminate\Support\Facades\Auth;
 
 class ProdutosController extends Controller
 {
@@ -19,21 +20,29 @@ class ProdutosController extends Controller
     }
 
     public function create() {
-        return view('produto.create');
+        if(Auth::check()) {
+            return view('produto.create');
+        } else {
+            return redirect('login');
+        }
     }
 
     public function store(Request $request) {
-        $this->validate($request, [
-            'referencia' => 'required|min:3',
-        ]);
-        $produto = new Produto();
-        $produto->referencia = $request->input('referencia');
-        $produto->titulo =  $request->input('titulo');
-        $produto->descricao = $request->input('descricao');
-        $produto->preco = $request->input('preco');
+        if(Auth::check()) {
+            $produto = new Produto();
+            $produto->referencia = $request->input('referencia');
+            $produto->titulo =  $request->input('titulo');
+            $produto->descricao = $request->input('descricao');
+            $produto->preco = $request->input('preco');
 
-        if($produto->save()) {
-            return redirect('podutos');
+            if($produto->save()) {
+                return redirect('podutos');
+            }
+            $this->validate($request, [
+                'referencia' => 'required|min:3',
+            ]);
+        } else {
+            return redirect('login');
         }
     }
 
@@ -43,30 +52,37 @@ class ProdutosController extends Controller
     }
 
     public function update($id, Request $request){
-        echo 'teste';
-        $produto = Produto::find($id);
-        $this->validate($request, [
-            'referencia' => 'required|min:3',
-            'titulo' => 'required|min:3',
-        ]);
-        if($request->hasFile('fotoproduto')){
-            $imagem = $request = $request->file('fotoproduto');
-            $nomearquivo = md5($id) . ".".$imagem->getClientOriginalExtension();
-            $request->file('fotoproduto')->move(public_path('./img/produtos/'), $nomearquivo);
+        if(Auth::check()) {
+            $produto = Produto::find($id);
+            $this->validate($request, [
+                'referencia' => 'required|min:3',
+                'titulo' => 'required|min:3',
+            ]);
+            if($request->hasFile('fotoproduto')){
+                $imagem = $request = $request->file('fotoproduto');
+                $nomearquivo = md5($id) . ".".$imagem->getClientOriginalExtension();
+                $request->file('fotoproduto')->move(public_path('./img/produtos/'), $nomearquivo);
+            }
+            $produto->referencia = $request->input('referencia');
+            $produto->titulo = $request->input('descricao');
+            $produto->preco = $request->input('preco');
+            $produto->save();
+            Session::flash('mensagem', 'Produto alterado com sucesso.');
+            return redirect()->back();
+        } else {
+            return redirect('login');
         }
-        $produto->referencia = $request->input('referencia');
-        $produto->titulo = $request->input('descricao');
-        $produto->preco = $request->input('preco');
-        $produto->save();
-        Session::flash('mensagem', 'Produto alterado com sucesso.');
-        return redirect()->back();
     }
 
     public function destroy($id) {
-        $produto = Produto::find($id);
-        $produto->delete();
-        Session::flash('mensagem', 'Produto excluído com sucesso.');
-        return redirect()->back();
+        if(Auth::check()) {
+            $produto = Produto::find($id);
+            $produto->delete();
+            Session::flash('mensagem', 'Produto excluído com sucesso.');
+            return redirect()->back();
+        } else {
+            return redirect('login');
+        }
     }
 
     public function buscar(Request $request) {

@@ -1,4 +1,4 @@
-@extends('layout.app')
+@extends('layouts.app')
 @section('title', 'Listagem de produtos')
 @section('content')
 <h1>Produtos</h1>
@@ -30,7 +30,7 @@
                 {{Html::image(asset('img/produtos/'.md5($produto->id).'.jpg'))}}
             </a>
         @else
-            <a href="{{url('peodutos/'.$produto->id)}}" class="thumbnail">
+            <a href="{{url('produtos/'.$produto->id)}}" class="thumbnail">
                 {{$produto->titulo}}
             </a>
         @endif

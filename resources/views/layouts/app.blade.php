@@ -7,7 +7,9 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>Olá Mundo - @yield('title')</title>
+    {{Html::style('css/bootstrap.min.css')}}
+    {{Html::style('css/bootstrap-theme.css')}}
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
@@ -73,8 +75,13 @@
         </nav>
 
         <main class="py-4">
-            @yield('content')
+            <div class="container">
+                @yield('content')
+            </div>
+
         </main>
     </div>
+    {{Html::script('js/jquery-3.4.1.min.js')}}
+    {{Html::script('js/bootstrap.min.js')}}
 </body>
 </html>
