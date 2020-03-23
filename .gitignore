@@ -2,4 +2,6 @@
 .env.testing
 .env.testing.example
 .env.example
+/Vendor
+
 
